@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>LogStream Polling Prototype</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #222;
+            color: white;
+        }
+
+        #terminal {
+            background: #000;
+            font-family: monospace;
+
+            height: 400px;
+
+            padding: 15px;
+
+            overflow-y: auto;
+
+            border: 1px solid #555;
+        }
+
+        .info {
+            color: lightgreen;
+        }
+
+        .warn {
+            color: orange;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>LogStream</h1>
+
+    <button id="startBtn">
+        Start Stream
+    </button>
+
+    <button id="stopBtn" disabled>
+        Stop Stream
+    </button>
+
+    <br><br>
+
+    <div id="terminal"></div>
+
+    <script src="index.js"></script>
+
+</body>
+</html>
