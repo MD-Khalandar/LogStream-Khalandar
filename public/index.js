@@ -5,6 +5,8 @@ const terminal = document.getElementById("terminal");
 let source=null;
 const clientIdInput = document.getElementById("clientId");
 let previousClientId = null;
+const filter = document.getElementById("filter");
+let sessionlogs=[];
 startBtn.addEventListener("click", () => {
 
     const clientId = clientIdInput.value.trim();
@@ -42,14 +44,22 @@ startBtn.addEventListener("click", () => {
 
     startBtn.disabled = true;
     stopBtn.disabled = false;
-
+    
     source.onmessage = (event) => {
+    const log = JSON.parse(event.data);
+         
+    const formatted =
+        `[${log.level}] ${log.timestamp} - ${log.message}`;
+    sessionlogs.push(formatted);
+    const selected = filter.value;
 
-        const log = JSON.parse(event.data);
-
+    if (
+        selected === "ALL" ||
+        (log.level === selected)
+    ) {
         displayLog(log);
-
-    };
+    }
+};
 
 });
 stopBtn.addEventListener("click", () => {
@@ -72,25 +82,39 @@ stopBtn.addEventListener("click", () => {
 
 });
 function displayLog(log) {
-
     const line = document.createElement("div");
 
     line.textContent =
         `[${log.level}] ${log.timestamp} - ${log.message}`;
 
-    if (log.level === "INFO") {
-        line.classList.add("info");
-    }
-
-    else if (log.level === "WARN") {
-        line.classList.add("warn");
-    }
-
-    else if (log.level === "ERROR") {
-        line.classList.add("error");
-    }
+    line.classList.add(log.level.toLowerCase());
 
     terminal.appendChild(line);
 
+    if (terminal.children.length > 100) {
+        terminal.removeChild(terminal.firstChild);
+    }
+
     terminal.scrollTop = terminal.scrollHeight;
 }
+const saveBtn = document.getElementById("saveBtn");
+
+saveBtn.addEventListener("click", () => {
+    const text = sessionlogs.join("\n");
+
+    const blob = new Blob(
+        [text],
+        { type: "text/plain" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "logs.txt";
+
+    link.click();
+
+    URL.revokeObjectURL(url);
+});
