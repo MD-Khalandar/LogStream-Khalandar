@@ -4,6 +4,7 @@ const terminal = document.getElementById("terminal");
 
 let source=null;
 const clientIdInput = document.getElementById("clientId");
+let previousClientId = null;
 startBtn.addEventListener("click", () => {
 
     const clientId = clientIdInput.value.trim();
@@ -13,30 +14,61 @@ startBtn.addEventListener("click", () => {
         return;
     }
 
+    const terminalHeader =
+        document.getElementById("terminalHeader");
+
+    if (
+        previousClientId !== null &&
+        previousClientId !== clientId
+    ) {
+        const line = document.createElement("div");
+
+        line.textContent =
+        `[INFO] ${new Date().toLocaleTimeString()} - Client changed from "${previousClientId}" to "${clientId}"`;
+
+        line.classList.add("info");
+
+        terminal.appendChild(line);
+    }
+
+    previousClientId = clientId;
+
+    terminalHeader.textContent =
+        `Session: ${clientId} | Status: LIVE`;
+
     source = new EventSource(
         `/stream?clientId=${encodeURIComponent(clientId)}`
     );
 
     startBtn.disabled = true;
     stopBtn.disabled = false;
+
     source.onmessage = (event) => {
 
-    const log = JSON.parse(event.data);
+        const log = JSON.parse(event.data);
 
-    displayLog(log);
+        displayLog(log);
 
-};
+    };
 
 });
 stopBtn.addEventListener("click", () => {
-     const terminalHeader = document.getElementById("terminalHeader");
-     const clientId = clientIdInput.value;
-    terminalHeader.textContent = `Session: ${clientId} | Status: Stopped `;
-    source.close();
-    source = null;
+
+    const terminalHeader =
+        document.getElementById("terminalHeader");
+
+    const clientId = clientIdInput.value;
+
+    terminalHeader.textContent =
+        `Session: ${clientId} | Status: STOPPED`;
+
+    if (source) {
+        source.close();
+        source = null;
+    }
+
     startBtn.disabled = false;
     stopBtn.disabled = true;
-
 
 });
 function displayLog(log) {

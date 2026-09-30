@@ -79,12 +79,12 @@ app.get("/stream", (req, res) => {
 
     res.write(
         `data: ${JSON.stringify({
-            clientId,
-            level: "INFO",
-            timestamp: getTimestamp(),
-            message: "Stream started"
-        })}\n\n`
-    );
+        clientId: clientId,
+        level: "INFO",
+        timestamp: getTimestamp(),
+        message: `Stream started for client ${clientId}`
+    })}\n\n`
+);
 
     const timer = setInterval(() => {
 
