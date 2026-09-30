@@ -56,9 +56,54 @@ function generateLog() {
 }
 
 app.get("/log", (req, res) => {
+
+    const clientId = req.query.clientId;
+
     const log = generateLog();
 
-    res.json(log);
+    res.json({
+        clientId: clientId,
+        ...log
+    });
+
+});
+app.get("/stream", (req, res) => {
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    const clientId = req.query.clientId;
+
+    console.log(`${clientId} connected`);
+
+    res.write(
+        `data: ${JSON.stringify({
+            clientId,
+            level: "INFO",
+            timestamp: getTimestamp(),
+            message: "Stream started"
+        })}\n\n`
+    );
+
+    const timer = setInterval(() => {
+
+        const log = generateLog();
+
+        res.write(
+            `data: ${JSON.stringify(log)}\n\n`
+        );
+
+    }, 500);
+
+    req.on("close", () => {
+
+        clearInterval(timer);
+
+        console.log(`${clientId} disconnected`);
+
+    });
+
 });
 
 app.listen(3000, () => {
