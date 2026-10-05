@@ -171,3 +171,5 @@ Available simulated messages are grouped by level:
 ## License
 
 No license file is currently included. Add a license before distributing or reusing this project publicly.
+
+Deployed on Render : https://logstream-khalandar.onrender.com/
